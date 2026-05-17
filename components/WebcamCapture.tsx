@@ -4,6 +4,8 @@ interface WebcamCaptureProps {
   onCapture: (base64: string) => void
 }
 
+type Phase = 'idle' | 'prepare' | 'streaming' | 'captured' | 'error'
+
 const PREP_TIPS = [
   { icon: '💡', title: 'Good lighting',     detail: 'Face a window or bright lamp — avoid backlighting' },
   { icon: '👓', title: 'Remove glasses',    detail: 'Take off glasses, sunglasses, or anything on your face' },
@@ -17,7 +19,9 @@ export function WebcamCapture({ onCapture }: WebcamCaptureProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const streamRef = useRef<MediaStream | null>(null)
 
-  const [phase, setPhase]     = useState<'idle' | 'prepare' | 'streaming' | 'captured' | 'error'>('idle')
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const [phase, setPhase]     = useState<Phase>('idle')
   const [preview, setPreview] = useState<string | null>(null)
   const [errorMsg, setErrorMsg] = useState('')
   const [checked, setChecked] = useState<Set<number>>(new Set())
@@ -69,6 +73,21 @@ export function WebcamCapture({ onCapture }: WebcamCaptureProps) {
     setPhase('idle')
   }
 
+  const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = () => {
+      const base64 = reader.result as string
+      setPreview(base64)
+      onCapture(base64)
+      setPhase('captured')
+    }
+    reader.readAsDataURL(file)
+    // reset so the same file can be re-selected if the user retakes
+    e.target.value = ''
+  }
+
   const toggleTip = (i: number) => {
     const next = new Set(checked)
     next.has(i) ? next.delete(i) : next.add(i)
@@ -88,9 +107,24 @@ export function WebcamCapture({ onCapture }: WebcamCaptureProps) {
           <p style={{ color: 'var(--text-muted)', marginBottom: 20, fontSize: 14 }}>
             A quick photo helps identify visible symptoms like facial swelling or pallor.
           </p>
-          <button className="btn btn-primary" onClick={() => setPhase('prepare')}>
-            Take Photo
-          </button>
+          <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap' }}>
+            <button className="btn btn-primary" onClick={() => setPhase('prepare')}>
+              Take Photo
+            </button>
+            <button
+              className="btn btn-secondary"
+              onClick={() => fileInputRef.current?.click()}
+            >
+              Upload Photo
+            </button>
+          </div>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            style={{ display: 'none' }}
+            onChange={handleUpload}
+          />
         </div>
       )}
 

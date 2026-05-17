@@ -284,20 +284,9 @@ export function FaceAnnotation({ imageSrc, symptoms, view }: Props) {
         const landmarker = await getLandmarker()
         if (cancelled) return
 
-        // Convert scaled canvas → data URL → fresh HTMLImageElement
-        // HTMLImageElement is the most compatible input type across browsers for MediaPipe
-        const scaledDataUrl = canvas.toDataURL('image/jpeg', 0.92)
-        const detectionImg = await new Promise<HTMLImageElement>((res, rej) => {
-          const el = new Image()
-          el.onload = () => res(el)
-          el.onerror = rej
-          el.src = scaledDataUrl
-        })
-        if (cancelled) return
-
         let result
         try {
-          result = landmarker.detect(detectionImg)
+          result = landmarker.detect(canvas)
         } catch (detectErr) {
           console.error('[FaceAnnotation] detect() threw:', detectErr)
           _landmarkerPromise = null
