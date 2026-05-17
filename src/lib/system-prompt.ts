@@ -100,7 +100,7 @@ You MUST respond with a single valid JSON object matching this exact schema. Do 
       "severity": "warning | urgent | emergent"
     }
   ],
-  "faceSymptoms": ["string — ONLY use exact terms from this list: periorbital edema, facial edema, facial flushing, pallor, jaundice, visual disturbances, facial paresthesia, severe cephalgia, diaphoresis, cyanosis. If a face photo was provided, populate this array with any visible findings. If no face photo was provided or no symptoms are visible, return an empty array."],
+  "faceSymptoms": ["string — ONLY use exact terms from this approved list (case-sensitive, exact spelling required): periorbital edema, facial edema, thyroid puffiness, pallor, lip pallor, jaundice, scleral icterus, cyanosis, petechiae, facial flushing, facial erythema, malar rash, diaphoresis, facial asymmetry, ptosis, periorbital darkening, nasal flaring. If a face photo was provided, scan carefully for each symptom and include ANY that are present or even subtly suggested. Err on the side of inclusion — flag it if there is reasonable visual evidence. If no face photo was provided, return an empty array."],
   "clinical_terms_used": [
     { "lay_term": "string", "clinical_term": "string" }
   ],
@@ -109,9 +109,27 @@ You MUST respond with a single valid JSON object matching this exact schema. Do 
 }
 
 FACE PHOTO ANALYSIS:
-If a face image is included in the request, analyze it for visible clinical markers and populate "faceSymptoms" using ONLY the exact terms from the enum list below. Do not paraphrase, do not use synonyms, do not invent terms outside the list.
-Allowed values: "periorbital edema", "facial edema", "facial flushing", "pallor", "jaundice", "visual disturbances", "facial paresthesia", "severe cephalgia", "diaphoresis", "cyanosis"
-If no face photo is provided or no symptoms are visible, return faceSymptoms as an empty array [].
+If a face image is included, carefully examine it for each of the following clinical markers. Flag a symptom if it is present OR subtly suggested — do not require certainty. Use ONLY the exact strings below, spelled exactly as shown.
+
+"periorbital edema" — puffiness, swelling, or fullness under or around the eyes; skin looks stretched or puffy in the orbital area
+"facial edema" — the overall face appears swollen, puffy, or fuller than typical; features look rounded or bloated
+"thyroid puffiness" — generalized doughy or waxy facial puffiness without localized swelling; face looks uniformly full
+"pallor" — face appears pale, washed-out, or lacking normal skin color; yellowish or grayish-white tone
+"lip pallor" — lips appear pale, whitish, or significantly lighter than normal pink; mucosa looks blanched
+"jaundice" — skin has a yellow or golden tint, especially visible on forehead or cheeks
+"scleral icterus" — whites of the eyes appear yellow or amber instead of white
+"cyanosis" — lips or perioral area appears blue, purple, or dusky
+"petechiae" — tiny red, purple, or dark pinpoint spots visible on the cheeks or skin; do not fade when pressed
+"facial flushing" — cheeks appear red, pink, or rosy beyond normal; face looks heated or flushed
+"facial erythema" — widespread redness across the full face, not just cheeks
+"malar rash" — redness or rash in a butterfly pattern across both cheeks and the bridge of the nose
+"diaphoresis" — skin appears moist, sweaty, or shiny, especially on the forehead
+"facial asymmetry" — one side of the face appears to droop, sag, or sit differently than the other; uneven features
+"ptosis" — one or both upper eyelids appear drooped or lower than the other
+"periorbital darkening" — dark circles under the eyes; sunken or shadowed orbital area
+"nasal flaring" — nostrils appear widened, flared, or actively moving
+
+Return faceSymptoms as an empty array [] only if no face photo is provided or none of the above are present even subtly.
 
 STRICT RULES:
 1. NEVER use the word "diagnosis," "diagnose," or "you have [condition]."

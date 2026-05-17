@@ -74,7 +74,7 @@ export async function POST(req: NextRequest) {
         { role: "user", content: userContent },
       ],
       response_format: { type: "json_object" },
-      temperature: 0.2,
+      temperature: 0,
       max_tokens: 4096,
     });
 
