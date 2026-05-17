@@ -284,9 +284,11 @@ export function FaceAnnotation({ imageSrc, symptoms, view }: Props) {
         const landmarker = await getLandmarker()
         if (cancelled) return
 
+        const imageData = ctx.getImageData(0, 0, W, H)
+
         let result
         try {
-          result = landmarker.detect(canvas)
+          result = landmarker.detect(imageData)
         } catch (detectErr) {
           console.error('[FaceAnnotation] detect() threw:', detectErr)
           _landmarkerPromise = null
